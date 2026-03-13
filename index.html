@@ -18,6 +18,7 @@
   --ok:#51cf66;--err:#ff6b6b;
   --c-email:#74b9ff;--c-phone:#a29bfe;--c-tc:#ff6b6b;--c-iban:#ffd43b;
   --c-cc:#fd79a8;--c-ip:#00cec9;--c-date:#fdcb6e;--c-plaka:#81ecec;
+  --c-isim:#e17055;--c-soyisim:#55efc4;--c-baba:#00b894;--c-dogum:#fab005;
   --r1:6px;--r2:10px;--r3:16px;--r4:20px;
 }
 *{margin:0;padding:0;box-sizing:border-box}
@@ -132,6 +133,10 @@ h1{font-size:32px;font-weight:700;letter-spacing:-.5px;background:linear-gradien
 .pii-ip{background:rgba(0,206,201,.1);border-color:var(--c-ip)}.pii-ip .pb{background:rgba(0,206,201,.2);color:var(--c-ip)}
 .pii-date{background:rgba(253,203,110,.1);border-color:var(--c-date)}.pii-date .pb{background:rgba(253,203,110,.2);color:var(--c-date)}
 .pii-plaka{background:rgba(129,236,236,.1);border-color:var(--c-plaka)}.pii-plaka .pb{background:rgba(129,236,236,.2);color:var(--c-plaka)}
+.pii-isim{background:rgba(225,112,85,.1);border-color:var(--c-isim)}.pii-isim .pb{background:rgba(225,112,85,.2);color:var(--c-isim)}
+.pii-soyisim{background:rgba(85,239,196,.1);border-color:var(--c-soyisim)}.pii-soyisim .pb{background:rgba(85,239,196,.2);color:var(--c-soyisim)}
+.pii-baba{background:rgba(0,184,148,.1);border-color:var(--c-baba)}.pii-baba .pb{background:rgba(0,184,148,.2);color:var(--c-baba)}
+.pii-dogum{background:rgba(250,176,5,.1);border-color:var(--c-dogum)}.pii-dogum .pb{background:rgba(250,176,5,.2);color:var(--c-dogum)}
 
 .nopii{text-align:center;padding:40px}
 .nopii svg{width:48px;height:48px;color:var(--ok);margin-bottom:12px}
@@ -230,10 +235,27 @@ const PII={
   iban:{l:'IBAN',c:'#ffd43b',p:[/\b[A-Z]{2}\d{2}\s?\d{4}\s?\d{4}\s?\d{4}\s?\d{4}\s?\d{4}\s?\d{2,4}\b/gi]},
   cc:{l:'Kredi Kartı',c:'#fd79a8',p:[/\b(?:4\d{3}|5[1-5]\d{2}|6011|3[47]\d{2})[\s\-]?\d{4}[\s\-]?\d{4}[\s\-]?\d{4}\b/g,/\b\d{4}[\s\-]\d{4}[\s\-]\d{4}[\s\-]\d{4}\b/g]},
   ip:{l:'IP Adresi',c:'#00cec9',p:[/\b(?:(?:25[0-5]|2[0-4]\d|[01]?\d\d?)\.){3}(?:25[0-5]|2[0-4]\d|[01]?\d\d?)\b/g]},
+  dogum:{l:'Doğum Tarihi',c:'#fab005',p:[
+    /(?<=\b(?:Do[gğ]um\s*Tarihi|D\.T\.|Dogum\s*Tarihi)\s*:\s*)\d{2}[\/\.\-]\d{2}[\/\.\-]\d{4}/gi,
+    /(?<=\b(?:Do[gğ]um\s*Tarihi|D\.T\.|Dogum\s*Tarihi)\s*:\s*)\d{4}[\/\.\-]\d{2}[\/\.\-]\d{2}/gi,
+    /(?<="(?:dogum_?tarihi|birth_?date|birthdate|dob)"\s*:\s*")\d{2}[\/\.\-]\d{2}[\/\.\-]\d{4}(?=")/gi,
+  ]},
   date:{l:'Tarih',c:'#fdcb6e',p:[/\b\d{2}[\/\.\-]\d{2}[\/\.\-]\d{4}\b/g,/\b\d{4}[\/\.\-]\d{2}[\/\.\-]\d{2}\b/g]},
   plaka:{l:'Plaka',c:'#81ecec',p:[/\b(?:0[1-9]|[1-7]\d|8[01])\s?[A-Z]{1,3}\s?\d{2,4}\b/g]},
+  isim:{l:'Ad / İsim',c:'#e17055',p:[
+    /(?<=\b(?:Ad[ıi]?|Ad[ıi]?\s*Soyad[ıi]?|İsim|Adınız)\s*:\s*)[A-ZÇĞİÖŞÜ][A-ZÇĞİÖŞÜa-zçğışöşü]+(?:\s+[A-ZÇĞİÖŞÜ][A-ZÇĞİÖŞÜa-zçğışöşü]+)*/gi,
+    /(?<="(?:ad|isim|firstname|first_name|name)"\s*:\s*")[A-ZÇĞİÖŞÜa-zçğışöşü]+(?:\s+[A-ZÇĞİÖŞÜa-zçğışöşü]+)*(?=")/gi,
+  ]},
+  soyisim:{l:'Soyad',c:'#55efc4',p:[
+    /(?<=\b(?:Soyad[ıi]?|Soyadınız)\s*:\s*)[A-ZÇĞİÖŞÜ][A-ZÇĞİÖŞÜa-zçğışöşü]+(?:\s+[A-ZÇĞİÖŞÜ][A-ZÇĞİÖŞÜa-zçğışöşü]+)*/gi,
+    /(?<="(?:soyad[ıi]?|lastname|last_name|surname)"\s*:\s*")[A-ZÇĞİÖŞÜa-zçğışöşü]+(?:\s+[A-ZÇĞİÖŞÜa-zçğışöşü]+)*(?=")/gi,
+  ]},
+  baba:{l:'Baba / Anne Adı',c:'#00b894',p:[
+    /(?<=\b(?:Baba\s*Ad[ıi]?|Anne\s*Ad[ıi]?|Veli\s*Ad[ıi]?)\s*:\s*)[A-ZÇĞİÖŞÜ][A-ZÇĞİÖŞÜa-zçğışöşü]+(?:\s+[A-ZÇĞİÖŞÜ][A-ZÇĞİÖŞÜa-zçğışöşü]+)*/gi,
+    /(?<="(?:baba_?ad[ıi]?|anne_?ad[ıi]?|father_?name|mother_?name)"\s*:\s*")[A-ZÇĞİÖŞÜa-zçğışöşü]+(?:\s+[A-ZÇĞİÖŞÜa-zçğışöşü]+)*(?=")/gi,
+  ]},
 };
-const TORD=['iban','cc','email','tc','phone','ip','date','plaka'];
+const TORD=['iban','cc','email','tc','phone','ip','dogum','date','plaka','isim','soyisim','baba'];
 
 function detect(text){
   const m=[],u=[];
@@ -469,12 +491,10 @@ function bake(pg){
   const ctx=c.getContext('2d');ctx.drawImage(pg.canvas,0,0);
   for(const r of pg.regions){
     if(dis.has(r.type))continue;
-    const pad=8,sx=Math.max(0,r.x-pad),sy=Math.max(0,r.y-pad),sw=r.w+pad*2,sh=r.h+pad*2;
-    const tmp=document.createElement('canvas');tmp.width=sw;tmp.height=sh;
-    const tc=tmp.getContext('2d');tc.filter='blur(16px)';
-    tc.drawImage(pg.canvas,sx,sy,sw,sh,0,0,sw,sh);
-    ctx.drawImage(tmp,sx,sy);
-    ctx.fillStyle=PII[r.type].c+'60';ctx.fillRect(sx,sy,sw,sh);
+    const pad=6,sx=Math.max(0,r.x-pad),sy=Math.max(0,r.y-pad),sw=r.w+pad*2,sh=r.h+pad*2;
+    // Solid opaque fill — veri tamamen okunamaz hale getirilir
+    ctx.fillStyle=PII[r.type].c;
+    ctx.fillRect(sx,sy,sw,sh);
   }
   return c;
 }
@@ -542,15 +562,12 @@ async function dlPPTX(){
         const img=new Image();await new Promise((r,j)=>{img.onload=r;img.onerror=j;img.src=url});
         const c=document.createElement('canvas');c.width=img.naturalWidth;c.height=img.naturalHeight;
         const ctx=c.getContext('2d');ctx.drawImage(img,0,0);
-        // Bake blur
+        // Solid opaque masking — veri tamamen okunamaz hale getirilir
         for(const r of pptxMediaPII[mf]){
           if(dis.has(r.type))continue;
           const pad=6,sx=Math.max(0,r.x-pad),sy=Math.max(0,r.y-pad),sw=r.w+pad*2,sh=r.h+pad*2;
-          const tmp=document.createElement('canvas');tmp.width=sw;tmp.height=sh;
-          tmp.getContext('2d').filter='blur(14px)';
-          tmp.getContext('2d').drawImage(c,sx,sy,sw,sh,0,0,sw,sh);
-          ctx.drawImage(tmp,sx,sy);
-          ctx.fillStyle=PII[r.type].c+'60';ctx.fillRect(sx,sy,sw,sh);
+          ctx.fillStyle=PII[r.type].c;
+          ctx.fillRect(sx,sy,sw,sh);
         }
         // Get extension
         const ext=mf.split('.').pop().toLowerCase();
